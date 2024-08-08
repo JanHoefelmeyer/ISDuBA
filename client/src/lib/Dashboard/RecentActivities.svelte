@@ -19,7 +19,8 @@
   import { Badge } from "flowbite-svelte";
   import { push } from "svelte-spa-router";
   import { convertVectorToLabel } from "$lib/Advisories/SSVC/SSVCCalculator";
-  const recentActivityQuery = `/api/events?limit=10&count=true&query=$event import_document events != me mentioned me involved or and now 168h duration - $time <= $actor me !=`;
+  import { defaultQueries, SEARCHTYPES } from "$lib/Queries/query";
+  const defaultActivitySearchParams = "limit=10&count=true";
   const documentQueryBase = `/api/documents?columns=id title publisher tracking_id ssvc`;
   const pluck = (arr: any, keys: any) => arr.map((i: any) => keys.map((k: any) => i[k]));
   let activityCount = 0;
@@ -27,6 +28,9 @@
   let loadActivityError: ErrorDetails | null;
   let loadMentionsError: ErrorDetails | null;
   let loadDocumentsError: ErrorDetails | null;
+  let searchParams = "";
+  let loadQueryError: ErrorDetails | null;
+  let title = "";
 
   const getRelativeTime = (date: Date) => {
     const now = Date.now();
@@ -95,7 +99,10 @@
   };
 
   const fetchActivities = async () => {
-    const activitiesResponse = await request(recentActivityQuery, "GET");
+    const activitiesResponse = await request(
+      `/api/events?${defaultActivitySearchParams}${searchParams}`,
+      "GET"
+    );
     if (activitiesResponse.ok) {
       const activities = await activitiesResponse.content;
       activityCount = activities.count;
@@ -166,14 +173,48 @@
     resultingActivities = sortByTime(aggregateByChange(activitiesAggregatedByMentions));
   };
 
+  const fetchQueries = async (): Promise<any[]> => {
+    const response = await request("/api/queries", "GET");
+    if (response.ok) {
+      const result = response.content;
+      return result.sort((q1: any, q2: any) => {
+        return q1.num > q2.num;
+      });
+    } else if (response.error) {
+      loadQueryError = getErrorDetails(`Could not load queries.`, response);
+    }
+    return [];
+  };
+
   onMount(async () => {
+    const queries = await fetchQueries();
+    const role = appStore.getRoles()[0];
+    const queryPrefix = `dashboard:`;
+    const queryPrefixWithRole = `${queryPrefix}:${role}`;
+    let query: any = queries.find(
+      (q) => q.name.startsWith(queryPrefixWithRole) && q.kind === SEARCHTYPES.EVENT
+    );
+    title = query?.name.split(":")[2] ?? "";
+    if (!query) {
+      query = defaultQueries.filter(
+        (q) => q.name.startsWith(queryPrefixWithRole) && q.kind === SEARCHTYPES.EVENT
+      )[0];
+      title = query?.name.split(":")[2] ?? "";
+    }
+    if (!query) {
+      query = defaultQueries.filter(
+        (q) => q.name.startsWith(queryPrefix) && q.kind === SEARCHTYPES.EVENT
+      )[0];
+      title = query.name.split(":")[1];
+    }
+    searchParams = `columns=${query.columns.join(" ")}&query=${query.query}&limit=6&orders=${query.orders}`;
     transformDataToActivities();
   });
 </script>
 
 {#if $appStore.app.isUserLoggedIn && (appStore.isEditor() || appStore.isReviewer() || appStore.isAuditor())}
   <div class="flex w-1/2 max-w-[50%] flex-col gap-4">
-    <SectionHeader title="Recent activities"></SectionHeader>
+    <SectionHeader {title}></SectionHeader>
     <div class="grid grid-cols-[repeat(auto-fit,_minmax(200pt,_1fr))] gap-6">
       {#if resultingActivities}
         {#if resultingActivities.length > 0}
@@ -233,5 +274,6 @@
     <ErrorMessage error={loadActivityError}></ErrorMessage>
     <ErrorMessage error={loadMentionsError}></ErrorMessage>
     <ErrorMessage error={loadDocumentsError}></ErrorMessage>
+    <ErrorMessage error={loadQueryError}></ErrorMessage>
   </div>
 {/if}

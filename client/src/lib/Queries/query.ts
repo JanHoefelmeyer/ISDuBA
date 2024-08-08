@@ -140,8 +140,41 @@ const generateQueryString = (currentSearch: Search) => {
   return encodeURI(queryURL);
 };
 
+const defaultQueries = [
+  {
+    kind: "advisories",
+    columns: [
+      "cvss_v3_score",
+      "cvss_v2_score",
+      "comments",
+      "critical",
+      "id",
+      "recent",
+      "title",
+      "publisher",
+      "ssvc",
+      "state",
+      "tracking_id"
+    ],
+    description: "Get new advisories sorted by criticality",
+    name: "dashboard:New advisories",
+    orders: "-recent",
+    query: "$state new workflow ="
+  },
+  {
+    kind: "events",
+    columns: [],
+    description: "Get latest activities where you are involved",
+    name: "dashboard:Recent activities",
+    orders: "-time",
+    query:
+      "$event import_document events != me mentioned me involved or and now 168h duration - $time <= $actor me !="
+  }
+];
+
 export {
   generateQueryString,
+  defaultQueries,
   COLUMNS,
   ORDERDIRECTIONS,
   SEARCHTYPES,

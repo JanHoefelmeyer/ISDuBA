@@ -19,9 +19,13 @@
   import Activity from "./Activity.svelte";
   import { getPublisher } from "$lib/utils";
   import { convertVectorToLabel } from "$lib/Advisories/SSVC/SSVCCalculator";
+  import { defaultQueries, SEARCHTYPES } from "$lib/Queries/query";
 
+  let searchParams = "";
   let documents: any[] = [];
   let newDocumentsError: ErrorDetails | null;
+  let loadQueryError: ErrorDetails | null;
+  let title = "";
 
   const compareCrit = (a: any, b: any) => {
     if (!b.critical || a.critical > b.critical) {
@@ -32,15 +36,21 @@
     return 0;
   };
 
+  const fetchQueries = async (): Promise<any[]> => {
+    const response = await request("/api/queries", "GET");
+    if (response.ok) {
+      const result = response.content;
+      return result.sort((q1: any, q2: any) => {
+        return q1.num > q2.num;
+      });
+    } else if (response.error) {
+      loadQueryError = getErrorDetails(`Could not load queries.`, response);
+    }
+    return [];
+  };
+
   const loadDocuments = async () => {
-    const columns =
-      "cvss_v3_score cvss_v2_score comments critical id recent title publisher ssvc state tracking_id";
-    const query = "$state new workflow =";
-    const sort = "-recent";
-    const response = await request(
-      `/api/documents?columns=${columns}&advisories=true&query=${query}&limit=6&orders=${sort}`,
-      "GET"
-    );
+    const response = await request(`/api/documents?${searchParams}`, "GET");
     if (response.ok) {
       documents = (await response.content.documents)?.sort(compareCrit) ?? [];
     } else if (response.error) {
@@ -49,6 +59,15 @@
   };
 
   onMount(async () => {
+    const queries = await fetchQueries();
+    const queryPrefix = "dashboard:";
+    let query: any =
+      queries.find((q) => q.name.startsWith(queryPrefix) && q.kind === SEARCHTYPES.ADVISORY) ??
+      defaultQueries.filter(
+        (q) => q.name.startsWith(queryPrefix) && q.kind === SEARCHTYPES.ADVISORY
+      )[0];
+    title = query.name.split(":")[1];
+    searchParams = `columns=${query.columns.join(" ")}&advisories=true&query=${query.query}&limit=6&orders=${query.orders}`;
     await loadDocuments();
   });
 
@@ -59,7 +78,7 @@
 
 {#if $appStore.app.isUserLoggedIn}
   <div class="flex w-1/2 max-w-[50%] flex-col gap-4">
-    <SectionHeader title="New advisories"></SectionHeader>
+    <SectionHeader {title}></SectionHeader>
     <div class="grid grid-cols-[repeat(auto-fit,_minmax(200pt,_1fr))] gap-6">
       {#if documents?.length && documents.length > 0}
         {#each documents as doc}
@@ -110,5 +129,6 @@
       {/if}
     </div>
     <ErrorMessage error={newDocumentsError}></ErrorMessage>
+    <ErrorMessage error={loadQueryError}></ErrorMessage>
   </div>
 {/if}
