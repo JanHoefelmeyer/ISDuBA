@@ -20,7 +20,9 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: npm install
+    - name: Enter client directory
+      run:  cd client
+    - name: Npm install
       run:  npm install
     - name: Install dependencies
       run: npm ci
