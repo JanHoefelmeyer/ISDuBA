@@ -25,7 +25,7 @@ jobs:
         cd client
         npm ci
         npx playwright install --with-deps
-        npx playwright tests
+        npx playwright test
       shell: bash
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
