@@ -20,16 +20,13 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Enter client directory
-      run:  cd client
     - name: Npm install
-      run:  npm install
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
+      run:  |
+        cd client
+        npm ci
+        npx playwright install --with-deps
+        npx playwright tests
+      shell: bash
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
