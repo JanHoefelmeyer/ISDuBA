@@ -22,6 +22,7 @@ jobs:
         node-version: lts/*
     - name: Npm install
       run:  |
+        ./docs/scripts/setup.sh
         cd client
         npm ci
         npx playwright install --with-deps
