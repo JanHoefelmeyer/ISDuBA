@@ -22,6 +22,7 @@ echo "END OF ECHO IN CONFIGUREPOSTGRES"
 # Alter PostgreSQL as postgres user
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 
+echo "Failure test"
 
 # Create keycloak user if it does not exist
 if sudo -u postgres psql -c "\du" | grep -q -F "keycloak"
