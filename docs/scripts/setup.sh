@@ -31,7 +31,7 @@ done
 
 sudo systemctl start postgresql.service # starts just installed postgres
 
-sudo -u postgresql bash ./configurepostgres.sh # creates necessary postgres users and databases
+sudo -u postgres bash ./configurepostgres.sh # creates necessary postgres users and databases
 
 ./installkeycloak.sh # installs keycloak
 
