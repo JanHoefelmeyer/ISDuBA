@@ -19,9 +19,9 @@ whoami
 echo "HERE IS 'ls -l'"
 echo $(id; ls -l)
 echo "------------------_"
-ls -l /etc/postgresql/
-cat /etc/postgresql/*/main/pg_ident.conf /etc/postgresql/*/main/postgresql.conf
-systemctl status  postgresql
+sudo -u postgres ls -l /etc/postgresql/
+sudo -u postgres cat /etc/postgresql/*/main/pg_ident.conf /etc/postgresql/*/main/postgresql.conf
+sudo -u postgres systemctl status  postgresql
 echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
 # Alter PostgreSQL as postgres user
