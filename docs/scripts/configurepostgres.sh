@@ -16,7 +16,10 @@ LAA="listen_addresses = '*'"          # Listen Adress After
 
 echo "HERE IN CONFIGUREPOSTGRES"
 whoami
-echo $(ls -al)
+echo "HERE IS 'ls -l'"
+echo $(id; ls -l)
+echo "------------------_"
+echo $(sudo -u postgres --list)
 echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
 # Alter PostgreSQL as postgres user
