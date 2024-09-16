@@ -29,7 +29,7 @@ done
 
 ./installpostgres.sh # installs postgreSQL
 
-sudo systemctl start postgresql.server # starts just installed postgres
+sudo systemctl start postgresql.service # starts just installed postgres
 
 sudo -u postgresql bash ./configurepostgres.sh # creates necessary postgres users and databases
 
