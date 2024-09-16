@@ -19,37 +19,36 @@ whoami
 echo "HERE IS 'ls -l'"
 echo $(id; ls -l)
 echo "------------------_"
-sudo -u postgres ls -l /etc/postgresql/
-sudo -u postgres cat /etc/postgresql/*/main/pg_ident.conf /etc/postgresql/*/main/postgresql.conf
-sudo -u postgres systemctl status  postgresql
+-l /etc/postgresql/
+systemctl status  postgresql
 echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
 # Alter PostgreSQL as postgres user
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 
 echo "Failure test"
 
 # Create keycloak user if it does not exist
-if sudo -u postgres psql -c "\du" | grep -q -F "keycloak"
+if psql -c "\du" | grep -q -F "keycloak"
 then
   echo "User keycloak already exists."
 else
-  sudo -u postgres psql -c "CREATE USER keycloak WITH PASSWORD 'keycloak';"
+  psql -c "CREATE USER keycloak WITH PASSWORD 'keycloak';"
 fi
 
 # Create keycloak database if it doesn't exist
-if sudo -u postgres psql -c "\l" | grep -q -F "keycloak"
+if psql -c "\l" | grep -q -F "keycloak"
 then
   echo "Database keycloak already exists."
 else
-  sudo -u postgres createdb -O keycloak -E 'UTF-8' keycloak
+  createdb -O keycloak -E 'UTF-8' keycloak
 fi
 
 # Adjust keycloak configuration
-sudo -u postgres sed -i "s/$LAB/$LAA/g" /etc/postgresql/16/main/postgresql.conf
-if ! sudo -u postgres grep -q -F "# ISDuBA configuration" /etc/postgresql/16/main/pg_hba.conf;
+sed -i "s/$LAB/$LAA/g" /etc/postgresql/16/main/postgresql.conf
+if ! grep -q -F "# ISDuBA configuration" /etc/postgresql/16/main/pg_hba.conf;
 then
-sudo -u postgres tee -a /etc/postgresql/16/main/pg_hba.conf <<block_to_insert > /dev/null
+tee -a /etc/postgresql/16/main/pg_hba.conf <<block_to_insert > /dev/null
 # ISDuBA configuration
 host    all             all             127.0.0.1/32            scram-sha-256
 block_to_insert

@@ -29,7 +29,9 @@ done
 
 ./installpostgres.sh # installs postgreSQL
 
-./configurepostgres.sh # creates necessary postgres users and databases
+sudo systemctl start postgresql.server # starts just installed postgres
+
+sudo -u postgresql bash ./configurepostgres.sh # creates necessary postgres users and databases
 
 ./installkeycloak.sh # installs keycloak
 
