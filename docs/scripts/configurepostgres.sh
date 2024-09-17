@@ -19,7 +19,6 @@ whoami
 echo "HERE IS 'ls -l'"
 echo $(id; ls -l)
 echo "------------------_"
--l /etc/postgresql/
 systemctl status  postgresql
 echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
