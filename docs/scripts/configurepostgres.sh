@@ -20,6 +20,8 @@ echo "HERE IS 'ls -l'"
 echo $(id; ls -l)
 echo "------------------_"
 systemctl status  postgresql
+ls -l /etc/postgresql/
+cat /etc/postgresql/*/main/pg_ident.conf /etc/postgresql/*/main/postgresql.conf
 echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
 # Alter PostgreSQL as postgres user
