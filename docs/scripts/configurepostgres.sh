@@ -14,12 +14,10 @@ set -e # to exit if a command in the script fails
 LAB="#listen_addresses = 'localhost'" # Listen Adress Before
 LAA="listen_addresses = '*'"          # Listen Adress After
 
-systemctl status  postgresql
+systemctl status postgresql
 
 # Alter PostgreSQL as postgres user
 psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
-
-echo "Failure test"
 
 # Create keycloak user if it does not exist
 if psql -c "\du" | grep -q -F "keycloak"
