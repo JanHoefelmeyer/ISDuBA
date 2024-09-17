@@ -23,11 +23,7 @@ jobs:
     - name: Npm install
       run:  |
         cd docs/scripts
-        whoami
-        ls -al
         ./setup.sh
-        ls -al
-        whoami
         cd ../..
         cd client
         npm ci

@@ -14,15 +14,7 @@ set -e # to exit if a command in the script fails
 LAB="#listen_addresses = 'localhost'" # Listen Adress Before
 LAA="listen_addresses = '*'"          # Listen Adress After
 
-echo "HERE IN CONFIGUREPOSTGRES"
-whoami
-echo "HERE IS 'ls -l'"
-echo $(id; ls -l)
-echo "------------------_"
 systemctl status  postgresql
-ls -l /etc/postgresql/
-cat /etc/postgresql/*/main/pg_ident.conf /etc/postgresql/*/main/postgresql.conf
-echo "END OF ECHO IN CONFIGUREPOSTGRES"
 
 # Alter PostgreSQL as postgres user
 psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
