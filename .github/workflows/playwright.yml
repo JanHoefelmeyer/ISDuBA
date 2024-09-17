@@ -24,7 +24,7 @@ jobs:
       run:  |
         cd docs/scripts
         ./setup.sh
-        ./playwright_test.sh
+        ./playwright_tests.sh
       shell: bash
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
